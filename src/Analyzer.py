@@ -1,7 +1,7 @@
 import subprocess as sub
 
 class main:
-    p = sub.Popen(('sudo', 'tcpdump', '-nnvvXSs', '1514', '-r', '../output'), stdout=sub.PIPE)
+    p = sub.Popen(('sudo', 'tcpdump', '-nn', '-r', '~/output'), stdout=sub.PIPE)
 
     import re
 
@@ -14,4 +14,4 @@ class main:
         print(m.group("Port1"))
         print(m.group("IP2"))
         print(m.group("Port2"))
-        print(m.group("size"))
+        print(m.group("protocol"))
