@@ -3,9 +3,9 @@
 . ./ip_config.cfg
 
 ssh-keygen -t rsa
-scp ~/.ssh/id_rsa.pub ubuntu@"$ip_main":~/"$my_ip"
-scp ~/.ssh/id_rsa.pub ubuntu@"$ip_1":~/"$my_ip"
-scp ~/.ssh/id_rsa.pub ubuntu@"$ip_2":~/"$my_ip"
+#scp ~/.ssh/id_rsa.pub ubuntu@"$ip_main":~/"$my_ip"
+#scp ~/.ssh/id_rsa.pub ubuntu@"$ip_1":~/"$my_ip"
+#scp ~/.ssh/id_rsa.pub ubuntu@"$ip_2":~/"$my_ip"
 
 ssh ubuntu@"$ip_main" mkdir -p .ssh
 cat ~/.ssh/id_rsa.pub | ssh ubuntu@"$ip_main" 'cat >> .ssh/authorized_keys'
