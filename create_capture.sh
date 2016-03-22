@@ -2,4 +2,5 @@
 
 . ./ip_config.cfg
 
-mergecap "$ip_1" "$ip_2" "ip_3" -w output
+sudo apparmor_parser -R /etc/apparmor.d/usr.sbin.tcpdump
+mergecap "$ip_1" "$ip_2" "$ip_3" -w output

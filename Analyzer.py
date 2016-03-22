@@ -1,8 +1,8 @@
 import subprocess as sub
 
 class Analyzer:
-    sub.call("../create_capture.sh")
-    p = sub.Popen(('sudo', 'tcpdump', '-nn', '-r', '../output'), stdout=sub.PIPE)
+    sub.call("./create_capture.sh")
+    p = sub.Popen(('sudo', 'tcpdump', '-nn', '-r', './output'), stdout=sub.PIPE)
 
     import re
 
