@@ -1,7 +1,8 @@
 import subprocess as sub
 
-class main:
-    p = sub.Popen(('sudo', 'tcpdump', '-nn', '-r', '~/output'), stdout=sub.PIPE)
+class Analyzer:
+    sub.call("../create_output.sh")
+    p = sub.Popen(('sudo', 'tcpdump', '-nn', '-r', '../output'), stdout=sub.PIPE)
 
     import re
 
