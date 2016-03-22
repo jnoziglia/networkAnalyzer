@@ -10,12 +10,14 @@ class Analyzer:
     reg = re.compile(regex_string)
     i = 0
     
-    for match in reg.finditer(p):
-        #m = reg.match(line)
-        print(m.group("timestamp"))
+    for line in iter(p.stdout.readline, b''):
+        m = reg.match(line)
+        print i
+        #print(m.group("timestamp"))
         #print(m.group("IP1"))
         #print(m.group("Port1"))
         #print(m.group("IP2"))
         #print(m.group("Port2"))
         #print(m.group("protocol"))
-    	print line
+        print line
+        i = i+1
