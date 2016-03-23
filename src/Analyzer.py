@@ -1,18 +1,34 @@
 import subprocess as sub
+import re
+
 
 class Analyzer:
-    sub.call("../create_capture.sh")
-    p = sub.Popen(('sudo', 'tcpdump', '-nn', '-r', '../output'), stdout=sub.PIPE)
+    regex_layer_3 = r'(?P<timestamp>(?:\d{1,2}\:){2}\d{1,2}\.\d{1,6}) (?P<proto>(?:IP|ARP))'
+    regex_ip = r'(?P<timestamp>(?:\d{1,2}\:){2}\d{1,2}\.\d{1,6}) IP (?P<IP1>(?:\d{1,3}\.){3}\d{1,3})\.(?P<Port1>\d+) > (?P<IP2>(?:\d{1,3}\.){3}\d{1,3})\.(?P<Port2>\d+)'
 
-    import re
-
-    reg = re.compile(r"(?P<timestamp>(?:\d{1,2}\:){2}\d{1,2}\.\d{1,6}) IP (?P<IP1>(?:\d{1,3}\.){3}\d{1,3})\.(?P<Port1>\d+) > (?P<IP2>(?:\d{1,3}\.){3}\d{1,3})\.(?P<Port2>\d+): (?P<protocol>(?:tcp|udp|icmp))")
-
-    for line in iter(p.stdout.readline, b''):
+    def process_ip(self, line):
+        reg = re.compile(regex_ip)
         m = reg.match(line)
-        print(m.group("timestamp"))
-        print(m.group("IP1"))
-        print(m.group("Port1"))
-        print(m.group("IP2"))
-        print(m.group("Port2"))
-        print(m.group("protocol"))
+        print(m.group('IP1'))
+
+    def main(self):
+        sub.call("./create_capture.sh")
+        p = sub.Popen(('sudo', 'tcpdump', '-l', '-nn', '-r', '../output'), stdout=sub.PIPE)
+
+        # regex_string = r'(?P<timestamp>(?:\d{1,2}\:){2}\d{1,2}\.\d{1,6}) IP (?P<IP1>(?:\d{1,3}\.){3}\d{1,3})\.(?P<Port1>\d+) > (?P<IP2>(?:\d{1,3}\.){3}\d{1,3})\.(?P<Port2>\d+): (?P<protocol>(?:TCP|UDP|ICMP))'
+
+        reg = re.compile(regex_layer_3)
+
+        # with open('outputtxt') as output:
+        #     for line in output:
+        #         m = reg.match(line)
+        #         print line
+        #         print m.group()
+
+        for line in iter(p.stdout.readline, b''):
+            m = reg.match(line)
+            if (m.group('proto') == 'IP'):
+                self.process_ip(line)
+
+    if __name__ == "__main__":
+        main()
