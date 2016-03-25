@@ -43,5 +43,5 @@ class Analyzer(object):
             print(event.src)
             print(event.timestamp)
 
-    if __name__ == "__main__":
-        main()
+if __name__ == "__main__":
+    Analyzer().main()
