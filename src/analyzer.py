@@ -1,7 +1,6 @@
 import subprocess as sub
 import re
 import sys
-
 sys.path.append('./')
 from event import *
 
