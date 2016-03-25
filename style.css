@@ -1,0 +1,15 @@
+body{
+	font-family: Calibri, arial, sans-serif
+}
+
+table {
+	background-color: black;
+	margin: 0 auto;
+}
+
+th, td {
+	text-align: center;
+	border: 1px solid black;
+	background-color: white;
+	padding: 5px;
+}
