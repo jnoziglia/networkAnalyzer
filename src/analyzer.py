@@ -65,7 +65,7 @@ class Analyzer(object):
             with tag('td'):
                 text(event.id)
     code = indent(doc.getvalue())
-    with open('report.html') as f:
+    with open('../report.html') as f:
         file_str = f.read()
     new_file_str = file_str.format(code=code)
     with open('report.html', 'w') as f:
