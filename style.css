@@ -2,6 +2,11 @@ body{
 	font-family: Calibri, arial, sans-serif
 }
 
+body > div {
+	height: 589px;
+	overflow-y: scroll;
+}
+
 table {
 	background-color: black;
 	margin: 0 auto;
