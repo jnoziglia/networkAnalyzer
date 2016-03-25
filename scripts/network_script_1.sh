@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. ./ip_config.cfg
+. ../ip_config.cfg
 
 for i in {1..20}
 do
