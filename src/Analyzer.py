@@ -6,7 +6,7 @@ sys.path.append('./')
 from event import *
 
 
-class Analyzer:
+class Analyzer(object):
     regex_ip_1 = r'IP (?:\(tos \w*, ttl \d*, id (?P<id>\d*), offset (?P<offset>\d*), flags \[\w*\], proto (?P<transport_protocol>\w*) (?:\(\d*\))?, length (?P<length>\d*)\))'
     # regex_ip_2 = r'(?P<IP1>(?:\d{1,3}\.){3}\d{1,3})\.?(?P<Port1>\d+)? > (?P<IP2>(?:\d{1,3}\.){3}\d{1,3})\.?(?P<Port2>\d+)?: (?P<transport_protocol>TCP|UDP|ICMP)'
     regex_timestamp = r'(?P<timestamp>(?:\d{1,2}\:){2}\d{1,2}\.\d{1,6}) (?P<protocol>IP|ARP)'
@@ -28,13 +28,13 @@ class Analyzer:
         events_empty = 1
         p = sub.Popen(('sudo', 'tcpdump', '-l', '-nnv', '-r', '../output'), stdout=sub.PIPE)
         for line in iter(p.stdout.readline, b''):
-            m = Analyzer.reg_timestamp.match(line)
+            m = self.reg_timestamp.match(line)
             if m:
                 if events_empty == 0:
-                    Analyzer.events.append(event)
+                    self.events.append(event)
                 events_empty = 0
                 event = Event(m.group('timestamp'))
-                m = Analyzer.reg_ip_1.match(line)
+                m = self.reg_ip_1.match(line)
                 if m:
                     event.id = m.group('id')
                     event.protocol = m.group('protocol')
