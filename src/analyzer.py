@@ -32,15 +32,16 @@ class Analyzer(object):
                 events.append(event)
             events_empty = 0
             event = Event(m.group('timestamp'))
-            m = reg_ip_1.match(line)
+            m = reg_ip_1.search(line)
             if m:
                 event.id = m.group('id')
                 event.protocol = m.group('protocol')
                 event.length = m.group('length')
 
     for event in events:
-        print(event.src)
         print(event.timestamp)
+        print(event.id)
+        print(event.length)
 
 # if __name__ == "__main__":
 #     Analyzer().main()
