@@ -23,25 +23,24 @@ class Analyzer(object):
     #         print line
     #         print m.group()
 
-    def main(self):
-        events_empty = 1
-        p = sub.Popen(('sudo', 'tcpdump', '-l', '-nnv', '-r', '../output'), stdout=sub.PIPE)
-        for line in iter(p.stdout.readline, b''):
-            m = self.reg_timestamp.match(line)
+    events_empty = 1
+    p = sub.Popen(('sudo', 'tcpdump', '-l', '-nnv', '-r', '../output'), stdout=sub.PIPE)
+    for line in iter(p.stdout.readline, b''):
+        m = reg_timestamp.match(line)
+        if m:
+            if events_empty == 0:
+                events.append(event)
+            events_empty = 0
+            event = Event(m.group('timestamp'))
+            m = reg_ip_1.match(line)
             if m:
-                if events_empty == 0:
-                    self.events.append(event)
-                events_empty = 0
-                event = Event(m.group('timestamp'))
-                m = self.reg_ip_1.match(line)
-                if m:
-                    event.id = m.group('id')
-                    event.protocol = m.group('protocol')
-                    event.length = m.group('length')
+                event.id = m.group('id')
+                event.protocol = m.group('protocol')
+                event.length = m.group('length')
 
-        for event in self.events:
-            print(event.src)
-            print(event.timestamp)
+    for event in events:
+        print(event.src)
+        print(event.timestamp)
 
-if __name__ == "__main__":
-    Analyzer().main()
+# if __name__ == "__main__":
+#     Analyzer().main()
