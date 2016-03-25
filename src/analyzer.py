@@ -36,13 +36,13 @@ class Analyzer(object):
                 event.t_protocol = m.group('transport_protocol')
                 event.length = m.group('length')
         else:
-            m = reg_ip_2.match(line)
+            m = reg_ip_2.search(line.decode())
             if m:
                 event.src = m.group('src')
                 event.src_port = m.group('src_port')
                 event.dst = m.group('dst')
                 event.dst_port = m.group('dst_port')
-            m = reg_port_error.match(line)
+            m = reg_port_error.search(line.decode())
             if m:
                 add_event = 0
 
