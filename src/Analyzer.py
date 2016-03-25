@@ -5,26 +5,18 @@ import sys
 sys.path.append('./')
 from event import *
 
-regex_layer_3 = r'(?P<timestamp>(?:\d{1,2}\:){2}\d{1,2}\.\d{1,6}) (?P<proto>(?:IP|ARP))'
-regex_ip_1 = r'IP (?P<timestamp>(?:\d{1,2}\:){2}\d{1,2}\.\d{1,6}) (?P<protocol>IP|ARP)'
-# regex_ip_2 = r'(?P<IP1>(?:\d{1,3}\.){3}\d{1,3})\.?(?P<Port1>\d+)? > (?P<IP2>(?:\d{1,3}\.){3}\d{1,3})\.?(?P<Port2>\d+)?: (?P<transport_protocol>TCP|UDP|ICMP)'
-regex_timestamp = r'(?P<timestamp>(?:\d{1,2}\:){2}\d{1,2}\.\d{1,6}) (?P<protocol>IP|ARP)'
-events = []
-
 
 class Analyzer:
-    def process_ip(self, line):
-        reg = re.compile(regex_ip)
-        m = reg.match(line)
-        event = Event(m.group('timestamp'), m.group('IP1'), m.group('IP2'), m.group('protocol'))
-        events.append(event)
+    regex_ip_1 = r'IP (?:\(tos \w*, ttl \d*, id (?P<id>\d*), offset (?P<offset>\d*), flags \[\w*\], proto (?P<transport_protocol>\w*) (?:\(\d*\))?, length (?P<length>\d*)\))'
+    # regex_ip_2 = r'(?P<IP1>(?:\d{1,3}\.){3}\d{1,3})\.?(?P<Port1>\d+)? > (?P<IP2>(?:\d{1,3}\.){3}\d{1,3})\.?(?P<Port2>\d+)?: (?P<transport_protocol>TCP|UDP|ICMP)'
+    regex_timestamp = r'(?P<timestamp>(?:\d{1,2}\:){2}\d{1,2}\.\d{1,6}) (?P<protocol>IP|ARP)'
+    reg_ip_1 = re.compile(regex_ip_1)
+    reg_timestamp = re.compile(regex_timestamp)
+    events = []
 
     # sub.call("./create_capture.sh")
-    p = sub.Popen(('sudo', 'tcpdump', '-l', '-nnv', '-r', '../output'), stdout=sub.PIPE)
 
     # regex_string = r'(?P<timestamp>(?:\d{1,2}\:){2}\d{1,2}\.\d{1,6}) IP (?P<IP1>(?:\d{1,3}\.){3}\d{1,3})\.(?P<Port1>\d+) > (?P<IP2>(?:\d{1,3}\.){3}\d{1,3})\.(?P<Port2>\d+): (?P<protocol>(?:TCP|UDP|ICMP))'
-
-    reg = re.compile(regex_layer_3)
 
     # with open('outputtxt') as output:
     #     for line in output:
@@ -32,11 +24,25 @@ class Analyzer:
     #         print line
     #         print m.group()
 
-    for line in iter(p.stdout.readline, b''):
-        m = reg.match(line)
-        if m.group('proto') == 'IP':
-            process_ip(line)
+    def main(self):
+        events_empty = 1
+        p = sub.Popen(('sudo', 'tcpdump', '-l', '-nnv', '-r', '../output'), stdout=sub.PIPE)
+        for line in iter(p.stdout.readline, b''):
+            m = Analyzer.reg_timestamp.match(line)
+            if m:
+                if events_empty == 0:
+                    Analyzer.events.append(event)
+                events_empty = 0
+                event = Event(m.group('timestamp'))
+                m = Analyzer.reg_ip_1.match(line)
+                if m:
+                    event.id = m.group('id')
+                    event.protocol = m.group('protocol')
+                    event.length = m.group('length')
 
-    for event in events:
-        print(event.src)
-        print(event.timestamp)
+        for event in self.events:
+            print(event.src)
+            print(event.timestamp)
+
+    if __name__ == "__main__":
+        main()
