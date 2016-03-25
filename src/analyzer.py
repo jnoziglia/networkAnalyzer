@@ -24,7 +24,7 @@ class Analyzer(object):
     #         print m.group()
 
     events_empty = 1
-    p = sub.Popen(('sudo', 'tcpdump', '-l', '-nnv', '-r', '../output'), stdout=sub.PIPE)
+    p = sub.Popen(('sudo', 'tcpdump', 'ip', '-l', '-nnv', '-r', '../output'), stdout=sub.PIPE)
     for line in iter(p.stdout.readline, b''):
         m = reg_timestamp.match(line)
         if m:
@@ -35,12 +35,12 @@ class Analyzer(object):
             m = reg_ip_1.search(line)
             if m:
                 event.id = m.group('id')
-                event.protocol = m.group('protocol')
+                event.protocol = m.group('transport_protocol')
                 event.length = m.group('length')
 
     for event in events:
         print(event.timestamp)
-        print(event.id)
+        print(event.protocol)
         print(event.length)
 
 # if __name__ == "__main__":
