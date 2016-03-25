@@ -1,9 +1,11 @@
 import subprocess as sub
 import re
 import sys
+import textwrap
 sys.path.append('./')
 from event import *
 from yattag import Doc
+from yattag import indent
 
 
 class Analyzer(object):
@@ -49,12 +51,12 @@ class Analyzer(object):
                 text(event.length)
             with tag('td'):
                 text(event.id)
-    code = doc.getvalue()
+    code = indent(doc.getvalue())
     with open('report.html') as f:
         file_str = f.read()
     new_file_str = file_str.format(code=code)
     with open('report.html', 'w') as f:
-        f.write(file_str)
+        f.write(new_file_str)
 
 # if __name__ == "__main__":
 #     Analyzer().main()
