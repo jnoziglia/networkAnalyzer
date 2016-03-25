@@ -31,30 +31,30 @@ class Analyzer(object):
                 event.t_protocol = m.group('transport_protocol')
                 event.length = m.group('length')
 
-        for event in events:
-            with tag ('tr'):
-                with tag('td'):
-                    text(event.timestamp)
-                with tag('td'):
-                    text(event.dst)
-                with tag('td'):
-                    text(event.dst_port)
-                with tag('td'):
-                    text(event.src)
-                with tag('td'):
-                    text(event.src_port)
-                with tag('td'):
-                    text(event.t_protocol)
-                with tag('td'):
-                    text(event.length)
-                with tag('td'):
-                    text(event.id)
-        code = doc.getvalue()
-        with open('report.html') as f:
-            file_str = f.read()
-        new_file_str = file_str.format(code=code)
-        with open('report.html', 'w') as f:
-            f.write(file_str)
+    for event in events:
+        with tag ('tr'):
+            with tag('td'):
+                text(event.timestamp)
+            with tag('td'):
+                text(event.dst)
+            with tag('td'):
+                text(event.dst_port)
+            with tag('td'):
+                text(event.src)
+            with tag('td'):
+                text(event.src_port)
+            with tag('td'):
+                text(event.t_protocol)
+            with tag('td'):
+                text(event.length)
+            with tag('td'):
+                text(event.id)
+    code = doc.getvalue()
+    with open('report.html') as f:
+        file_str = f.read()
+    new_file_str = file_str.format(code=code)
+    with open('report.html', 'w') as f:
+        f.write(file_str)
 
 # if __name__ == "__main__":
 #     Analyzer().main()
