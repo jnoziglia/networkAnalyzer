@@ -5,6 +5,7 @@ class Host:
         self.bytes_sent = 0
         self.hosts = []
         self.protocols = []
+        self.color = ''
 
     def find_host(self, ip):
         list = [x for x in self.hosts if x.ip == ip]

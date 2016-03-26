@@ -1,6 +1,7 @@
 import subprocess as sub
 import re
 import sys
+import random
 import textwrap
 sys.path.append('./')
 from event import *
@@ -21,6 +22,7 @@ reg_timestamp = re.compile(regex_timestamp)
 reg_port_error = re.compile(regex_port_error)
 events = []
 hosts = []
+add_event = 0
 
 
 class Analyzer(object):
@@ -44,6 +46,22 @@ class Analyzer(object):
                     text(event.length)
                 with tag('td'):
                     text(event.id)
+        with tag('h2'):
+            text('Resultados por IP')
+        for host in hosts:
+            with tag('h3'):
+                text(host.ip)
+            with tag('p'):
+                text('Total Bytes Received: {}b'.format(host.total_bytes_received))
+            for src_host in host.hosts:
+                with tag('h4'):
+                    text('Bytes received from {}'.format(src_host.ip))
+                with tag('p'):
+                    text('Total: {}b'.format(src_host.ip, src_host.bytes_sent))
+                for protocol in src_host.protocols:
+                    with tag('p'):
+                        text('{}: {}b'.format(protocol.name, protocol.bytes_sent))
+
         return indent(doc.getvalue())
 
     def find_host(self, ip):
@@ -93,6 +111,7 @@ class Analyzer(object):
                                 src_host = Host(event.src)
                                 protocol = Protocol(event.t_protocol, length)
                                 src_host.protocols.append(protocol)
+                                src_host.bytes_sent = src_host.bytes_sent + length
                                 host.hosts.append(src_host)
                         else:
                             host = Host(event.dst)

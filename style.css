@@ -2,9 +2,11 @@ body{
 	font-family: Calibri, arial, sans-serif
 }
 
-body > div {
+.events {
 	height: 589px;
 	overflow-y: scroll;
+	width: 660px;
+    margin: 0 auto;
 }
 
 table {
@@ -17,4 +19,12 @@ th, td {
 	border: 1px solid black;
 	background-color: white;
 	padding: 5px;
+}
+
+.bar-container {
+	height: 30px;
+    border: 1px solid black;
+    overflow-y: auto;
+    width: 1000px;
+    position: relative;
 }
