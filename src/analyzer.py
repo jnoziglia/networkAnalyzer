@@ -78,7 +78,7 @@ class Analyzer(object):
                     event.dst_port = m.group('dst_port')
                     m = reg_length.search(line.decode())
                     if m and m.group('length') != 0:
-                        length = m.group('length')
+                        length = int(m.group('length'))
                         host = self.find_host(event.dst)
                         if host:
                             src_host = host.find_host(event.src)
@@ -112,6 +112,15 @@ class Analyzer(object):
         new_file_str = file_str.format(code=code)
         with open('report.html', 'w') as f:
             f.write(new_file_str)
+
+        for host in hosts:
+            print (host.ip)
+            print (host.total_bytes_received)
+            for src in host.hosts:
+                print(src.ip)
+                for protocol in src.protocols:
+                    print (protocol.name)
+                    print (protocol.bytes_sent)
 
 if __name__ == "__main__":
     Analyzer().main()
