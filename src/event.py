@@ -1,8 +1,3 @@
-import subprocess as sub
-import re
-
-
-
 class Event(object):
     def __init__(self, timestamp, protocol):
         self.timestamp = timestamp
