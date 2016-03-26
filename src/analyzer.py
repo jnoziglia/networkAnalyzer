@@ -71,9 +71,9 @@ class Analyzer(object):
         for host in hosts:
             left = 0
             total_received = host.total_bytes_received
-            color = "#%06x" % random.randint(0, 0xFFFFFF)
             with tag('div', klass="bar-container"):
                 for src_host in host.hosts:
+                    color = "#%06x" % random.randint(0, 0xFFFFFF)
                     received = (src_host.bytes_sent / total_received) * 100
                     with tag('div', klass="bar", style="width:{}%; left:{}%; background-color:{}".format(received, left, color)):
                         text('')
@@ -130,7 +130,6 @@ class Analyzer(object):
                                 protocol = Protocol(event.t_protocol, length)
                                 src_host.protocols.append(protocol)
                                 host.hosts.append(src_host)
-                            src_host.bytes_sent = src_host.bytes_sent + length
                         else:
                             host = Host(event.dst)
                             src_host = Host(event.src)
@@ -138,6 +137,7 @@ class Analyzer(object):
                             src_host.protocols.append(protocol)
                             host.hosts.append(src_host)
                             hosts.append(host)
+                        src_host.bytes_sent = src_host.bytes_sent + length
                         host.total_bytes_received = host.total_bytes_received + length
                 m = reg_port_error.search(line.decode())
                 if m:
