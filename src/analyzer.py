@@ -22,7 +22,6 @@ reg_timestamp = re.compile(regex_timestamp)
 reg_port_error = re.compile(regex_port_error)
 events = []
 hosts = []
-add_event = 0
 
 
 class Analyzer(object):
@@ -46,6 +45,7 @@ class Analyzer(object):
                     text(event.length)
                 with tag('td'):
                     text(event.id)
+        return indent(doc.getvalue())
 
     def generate_received_html(self):
         doc, tag, text = Doc().tagtext()
@@ -64,13 +64,12 @@ class Analyzer(object):
                 for protocol in src_host.protocols:
                     with tag('p'):
                         text('{}: {}b'.format(protocol.name, protocol.bytes_sent))
-
         return indent(doc.getvalue())
 
     def find_host(self, ip):
-        list = [x for x in hosts if x.ip == ip]
-        if list:
-            return list[0]
+        host_list = [x for x in hosts if x.ip == ip]
+        if host_list:
+            return host_list[0]
         else:
             return None
 
@@ -114,8 +113,8 @@ class Analyzer(object):
                                 src_host = Host(event.src)
                                 protocol = Protocol(event.t_protocol, length)
                                 src_host.protocols.append(protocol)
-                                src_host.bytes_sent = src_host.bytes_sent + length
                                 host.hosts.append(src_host)
+                            src_host.bytes_sent = src_host.bytes_sent + length
                         else:
                             host = Host(event.dst)
                             src_host = Host(event.src)
