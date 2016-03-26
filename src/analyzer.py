@@ -77,6 +77,7 @@ class Analyzer(object):
                     received = total_received / src_host.bytes_sent
                     with tag('div', klass="bar", style="width:{}; left:{}; background-color:{}".format(received, left, color)):
                         text('')
+        return indent(doc.getvalue())
 
 
 
