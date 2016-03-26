@@ -28,3 +28,8 @@ th, td {
     width: 1000px;
     position: relative;
 }
+
+.bar {
+	height: 30px;
+	position: absolute;
+}

@@ -66,6 +66,20 @@ class Analyzer(object):
                         text('{}: {}b'.format(protocol.name, protocol.bytes_sent))
         return indent(doc.getvalue())
 
+    def generate_graph_html(self):
+        doc, tag, text = Doc().tagtext()
+        for host in hosts:
+            left = 0
+            total_received = host.total_bytes_received
+            color = "#%06x" % random.randint(0, 0xFFFFFF)
+            with tag('div', klass="bar-container"):
+                for src_host in host.hosts:
+                    received = total_received / src_host.bytes_sent
+                    with tag('div', klass="bar", style="width:{}; left:{}; background-color:{}".format(received, left, color)):
+                        text('')
+
+
+
     def find_host(self, ip):
         host_list = [x for x in hosts if x.ip == ip]
         if host_list:
@@ -129,9 +143,10 @@ class Analyzer(object):
 
         events_html = self.generate_events_html()
         received_html = self.generate_received_html()
+        graph_html = self.generate_graph_html()
         with open('./report_template.html') as f:
             file_str = f.read()
-        new_file_str = file_str.format(events_html=events_html, received_html=received_html)
+        new_file_str = file_str.format(events_html=events_html, received_html=received_html, graph_html=graph_html)
         with open('report.html', 'w') as f:
             f.write(new_file_str)
 
