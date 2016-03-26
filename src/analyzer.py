@@ -74,9 +74,10 @@ class Analyzer(object):
             color = "#%06x" % random.randint(0, 0xFFFFFF)
             with tag('div', klass="bar-container"):
                 for src_host in host.hosts:
-                    received = total_received / src_host.bytes_sent
-                    with tag('div', klass="bar", style="width:{}; left:{}; background-color:{}".format(received, left, color)):
+                    received = (src_host.bytes_sent / total_received) * 100
+                    with tag('div', klass="bar", style="width:{}%; left:{}%; background-color:{}".format(received, left, color)):
                         text('')
+                    left = left + received
         return indent(doc.getvalue())
 
 
