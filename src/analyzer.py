@@ -26,7 +26,7 @@ add_event = 0
 
 
 class Analyzer(object):
-    def generate_html(self):
+    def generate_events_html(self):
         doc, tag, text = Doc().tagtext()
         for event in events:
             with tag('tr'):
@@ -46,6 +46,9 @@ class Analyzer(object):
                     text(event.length)
                 with tag('td'):
                     text(event.id)
+
+    def generate_received_html(self):
+        doc, tag, text = Doc().tagtext()
         with tag('h2'):
             text('Resultados por IP')
         for host in hosts:
@@ -57,7 +60,7 @@ class Analyzer(object):
                 with tag('h4'):
                     text('Bytes received from {}'.format(src_host.ip))
                 with tag('p'):
-                    text('Total: {}b'.format(src_host.ip, src_host.bytes_sent))
+                    text('Total: {}b'.format(src_host.bytes_sent))
                 for protocol in src_host.protocols:
                     with tag('p'):
                         text('{}: {}b'.format(protocol.name, protocol.bytes_sent))
@@ -125,10 +128,11 @@ class Analyzer(object):
                 if m:
                     add_event = 0
 
-        code = self.generate_html()
+        events_html = self.generate_events_html()
+        received_html = self.generate_received_html()
         with open('./report_template.html') as f:
             file_str = f.read()
-        new_file_str = file_str.format(code=code)
+        new_file_str = file_str.format(events_html=events_html, received_html=received_html)
         with open('report.html', 'w') as f:
             f.write(new_file_str)
 
