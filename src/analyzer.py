@@ -2,7 +2,6 @@ import subprocess as sub
 import re
 import sys
 import random
-import textwrap
 sys.path.append('./')
 from event import *
 from host import *
@@ -10,6 +9,7 @@ from protocol import *
 from yattag import Doc
 from yattag import indent
 
+# Regular expressions (both strings and compiled expressions) to parse TCPDump output
 regex_ip_1 = r'IP (?:\(tos \w*, ttl \d*, id (?P<id>\d*), offset (?P<offset>\d*), flags \[\w*\], proto (?P<transport_protocol>\w*) (?:\(\d*\))?, length (?P<length>\d*)\))'
 regex_ip_2 = r'(?P<src>(?:\d{1,3}\.){3}\d{1,3})\.?(?P<src_port>\d*) > (?P<dst>(?:\d{1,3}\.){3}\d{1,3})\.?(?P<dst_port>\d*): (?P<transport_protocol>\w+)'
 regex_timestamp = r'(?P<timestamp>(?:\d{1,2}\:){2}\d{1,2}\.\d{1,6}) (?P<protocol>\w+)'
@@ -20,11 +20,14 @@ reg_ip_2 = re.compile(regex_ip_2)
 reg_length = re.compile(regex_length)
 reg_timestamp = re.compile(regex_timestamp)
 reg_port_error = re.compile(regex_port_error)
+# List of all events logged
 events = []
+# List of terminals involved in the network
 hosts = []
 
 
 class Analyzer(object):
+    # Method to generate a list of all logged events, in HTML
     def generate_events_html(self):
         doc, tag, text = Doc().tagtext()
         for event in events:
@@ -47,6 +50,7 @@ class Analyzer(object):
                     text(event.id)
         return indent(doc.getvalue())
 
+    # Method to generate a list of bytes received by each host, in HTML
     def generate_received_html(self):
         doc, tag, text = Doc().tagtext()
         with tag('h2'):
@@ -66,6 +70,7 @@ class Analyzer(object):
                         text('{}: {}b'.format(protocol.name, protocol.bytes_sent))
         return indent(doc.getvalue())
 
+    # Method to generate
     def generate_graph_html(self):
         doc, tag, text = Doc().tagtext()
         for host in hosts:
