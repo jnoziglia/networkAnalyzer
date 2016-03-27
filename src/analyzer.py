@@ -27,6 +27,14 @@ hosts = []
 
 
 class Analyzer(object):
+    # Method to generate size in readable unit
+    def sizeof_fmt(num, suffix='B'):
+        for unit in ['','Ki','Mi','Gi','Ti','Pi','Ei','Zi']:
+            if abs(num) < 1024.0:
+                return "%3.1f%s%s" % (num, unit, suffix)
+            num /= 1024.0
+        return "%.1f%s%s" % (num, 'Yi', suffix)
+
     # Method to generate a list of all logged events, in HTML
     def generate_events_html(self):
         doc, tag, text = Doc().tagtext()
@@ -85,8 +93,6 @@ class Analyzer(object):
                     left = left + received
         return indent(doc.getvalue())
 
-
-
     def find_host(self, ip):
         host_list = [x for x in hosts if x.ip == ip]
         if host_list:
@@ -94,10 +100,8 @@ class Analyzer(object):
         else:
             return None
 
-    def main(self):
-        # sub.call("./create_capture.sh")
+    def process_dump_file(self, p):
         add_event = 0
-        p = sub.Popen(('sudo', 'tcpdump', 'ip', '-l', '-nnv', '-r', '../output'), stdout=sub.PIPE)
         for line in iter(p.stdout.readline, b''):
             m = reg_timestamp.match(line.decode())
             if m:
@@ -148,6 +152,9 @@ class Analyzer(object):
                 if m:
                     add_event = 0
 
+    def main(self):
+        p = sub.Popen(('sudo', 'tcpdump', 'ip', '-l', '-nnv', '-r', '../output'), stdout=sub.PIPE)
+        self.process_dump_file(p)
         events_html = self.generate_events_html()
         received_html = self.generate_received_html()
         graph_html = self.generate_graph_html()
