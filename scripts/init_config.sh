@@ -1,5 +1,5 @@
-git config --global user.email "julian.noziglia@gmail.com"
-git config --global user.name "Julian Noziglia"
-apt-get install sendip
 apt-get install wireshark-common
+apt-get install python3-pip
+pip3 install yattag
 chmod u+x *.sh
+apparmor_parser -R /etc/apparmor.d/usr.sbin.tcpdump

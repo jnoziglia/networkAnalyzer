@@ -157,14 +157,6 @@ class Analyzer(object):
         with open('report.html', 'w') as f:
             f.write(new_file_str)
 
-        for host in hosts:
-            print (host.ip)
-            print (host.total_bytes_received)
-            for src in host.hosts:
-                print(src.ip)
-                for protocol in src.protocols:
-                    print (protocol.name)
-                    print (protocol.bytes_sent)
 
 if __name__ == "__main__":
     Analyzer().main()

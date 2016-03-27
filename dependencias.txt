@@ -1,4 +1,0 @@
-wireshark-common
-sendip
-python3-pip / pip
-yattak (biblioteca de python, instalar con pip)
