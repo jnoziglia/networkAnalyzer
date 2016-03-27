@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. ../ip_config.cfg
+. ~/networkAnalyzer/config/ip_config.cfg
 
 ssh ubuntu@"$ip_1" '~/networkAnalyzer/scripts/capture_script.sh'
 ssh ubuntu@"$ip_2" '~/networkAnalyzer/scripts/capture_script.sh'
