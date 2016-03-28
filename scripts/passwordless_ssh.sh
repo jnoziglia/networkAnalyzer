@@ -1,11 +1,12 @@
 #!/bin/bash
 
+# Script to create public key and send it to the other hosts in order to
+# connect through SSH without authenticating
+# Runs on terminals
+
 . ../config/ip_config.cfg
 
 ssh-keygen -t rsa
-#scp ~/.ssh/id_rsa.pub ubuntu@"$ip_main":~/"$my_ip"
-#scp ~/.ssh/id_rsa.pub ubuntu@"$ip_1":~/"$my_ip"
-#scp ~/.ssh/id_rsa.pub ubuntu@"$ip_2":~/"$my_ip"
 
 ssh ubuntu@"$ip_main" mkdir -p .ssh
 cat ~/.ssh/id_rsa.pub | ssh ubuntu@"$ip_main" 'cat >> .ssh/authorized_keys'

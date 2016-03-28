@@ -1,20 +1,26 @@
 import subprocess as sub
 import re
 import sys
-import random
-sys.path.append('./')
 from event import *
 from host import *
 from protocol import *
 from yattag import Doc
 from yattag import indent
+sys.path.append('./')
 
+# Global variables
 # Regular expressions (both strings and compiled expressions) to parse TCPDump output
-regex_ip_1 = r'IP (?:\(tos \w*, ttl \d*, id (?P<id>\d*), offset (?P<offset>\d*), flags \[\w*\], proto (?P<transport_protocol>\w*) (?:\(\d*\))?, length (?P<length>\d*)\))'
-regex_ip_2 = r'(?P<src>(?:\d{1,3}\.){3}\d{1,3})\.?(?P<src_port>\d*) > (?P<dst>(?:\d{1,3}\.){3}\d{1,3})\.?(?P<dst_port>\d*): (?P<transport_protocol>\w+)'
+# Regex including timestamp. First line of every packet
 regex_timestamp = r'(?P<timestamp>(?:\d{1,2}\:){2}\d{1,2}\.\d{1,6}) (?P<protocol>\w+)'
+# First line of every IP datagram
+regex_ip_1 = r'IP (?:\(tos \w*, ttl \d*, id (?P<id>\d*), offset (?P<offset>\d*), flags \[\w*\], proto (?P<transport_protocol>\w*) (?:\(\d*\))?, length (?P<length>\d*)\))'
+# Second line of every IP datagram
+regex_ip_2 = r'(?P<src>(?:\d{1,3}\.){3}\d{1,3})\.?(?P<src_port>\d*) > (?P<dst>(?:\d{1,3}\.){3}\d{1,3})\.?(?P<dst_port>\d*): (?P<transport_protocol>\w+)'
+# Port unreachable error. Packet should get discarded
 regex_port_error = r'port \w+ unreachable'
+# Regex to get length of TCP packet
 regex_length = r'length (?P<length>\d+)'
+# Compiled regexs
 reg_ip_1 = re.compile(regex_ip_1)
 reg_ip_2 = re.compile(regex_ip_2)
 reg_length = re.compile(regex_length)
@@ -26,9 +32,11 @@ events = []
 hosts = []
 
 
+# Main class
 class Analyzer(object):
     # Method to generate size in readable unit
-    def sizeof_fmt(self, num, suffix='B'):
+    @staticmethod
+    def sizeof_fmt(num, suffix='B'):
         for unit in ['', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei', 'Zi']:
             if abs(num) < 1024.0:
                 return "%3.3f%s%s" % (num, unit, suffix)
@@ -36,7 +44,8 @@ class Analyzer(object):
         return "%.3f%s%s" % (num, 'Yi', suffix)
 
     # Method to generate a list of all logged events, in HTML
-    def add_event_to_html(self, event, main_doc, main_tag, main_text):
+    @staticmethod
+    def add_event_to_html(event, main_doc, main_tag, main_text):
         with main_tag('tr'):
             with main_tag('td'):
                 main_text(event.timestamp)
@@ -76,20 +85,12 @@ class Analyzer(object):
         return indent(doc.getvalue())
 
     # Method to generate bar chart in HTML
-    def generate_graph_html(self):
+    @staticmethod
+    def generate_graph_html():
         doc, tag, text = Doc().tagtext()
         with tag('h1'):
             text('Percentage of data transferred from each host')
         for host in hosts:
-            # left = 0
-            # total_received = host.total_bytes_received
-            # with tag('div', klass="bar-container"):
-            #     for src_host in host.hosts:
-            #         color = "#%06x" % random.randint(0, 0xFFFFFF)
-            #         received = (src_host.bytes_sent / total_received) * 100
-            #         with tag('div', klass="bar", style="width:{}%; left:{}%; background-color:{}".format(received, left, color)):
-            #             text('')
-            #         left = left + received
             total_received = host.total_bytes_received
             with tag('h2'):
                 text(host.ip)
@@ -105,7 +106,8 @@ class Analyzer(object):
         return indent(doc.getvalue())
 
     # Returns host in hosts list, filtered by IP
-    def find_host(self, ip):
+    @staticmethod
+    def find_host(ip):
         host_list = [x for x in hosts if x.ip == ip]
         if host_list:
             return host_list[0]
@@ -170,8 +172,8 @@ class Analyzer(object):
         return indent(main_doc.getvalue())
 
     # Main function, executed when ran from terminal
-    def main(self):
-        p = sub.Popen(('sudo', 'tcpdump', 'ip', '-l', '-nnv', '-r', '../output'), stdout=sub.PIPE)
+    def main(self, dump_file):
+        p = sub.Popen(('sudo', 'tcpdump', 'ip', '-l', '-nnv', '-r', dump_file), stdout=sub.PIPE)
         events_html = self.process_dump_file(p)
         received_html = self.generate_received_html()
         graph_html = self.generate_graph_html()
@@ -185,4 +187,4 @@ class Analyzer(object):
             f.write(new_file_str)
 
 if __name__ == "__main__":
-    Analyzer().main()
+    Analyzer().main(sys.argv[1])
