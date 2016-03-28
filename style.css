@@ -30,6 +30,17 @@ th, td {
 }
 
 .bar {
-	height: 30px;
-	position: absolute;
+	height: 20px;
+    background-color: steelblue;
 }
+
+.bar-chart {
+	margin: 10px 0
+}
+
+.ip-address {
+    width: 6%;
+    text-align: left;
+    height: 25px;
+}
+

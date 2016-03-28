@@ -31,9 +31,9 @@ class Analyzer(object):
     def sizeof_fmt(self, num, suffix='B'):
         for unit in ['', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei', 'Zi']:
             if abs(num) < 1024.0:
-                return "%3.1f%s%s" % (num, unit, suffix)
+                return "%3.3f%s%s" % (num, unit, suffix)
             num /= 1024.0
-        return "%.1f%s%s" % (num, 'Yi', suffix)
+        return "%.3f%s%s" % (num, 'Yi', suffix)
 
     # Method to generate a list of all logged events, in HTML
     def add_event_to_html(self, event, main_doc, main_tag, main_text):
@@ -58,10 +58,10 @@ class Analyzer(object):
     # Method to generate a list of bytes received by each host, in HTML
     def generate_received_html(self):
         doc, tag, text = Doc().tagtext()
-        with tag('h2'):
-            text('Resultados por IP')
+        with tag('h1'):
+            text('Amount of data transferred from each host')
         for host in hosts:
-            with tag('h3'):
+            with tag('h2'):
                 text(host.ip)
             with tag('p'):
                 text('Total Bytes Received: {}'.format(self.sizeof_fmt(host.total_bytes_received)))
@@ -78,16 +78,33 @@ class Analyzer(object):
     # Method to generate
     def generate_graph_html(self):
         doc, tag, text = Doc().tagtext()
+        with tag('h1'):
+            text('Percentage of data transferred from each host')
         for host in hosts:
-            left = 0
+            # left = 0
+            # total_received = host.total_bytes_received
+            # with tag('div', klass="bar-container"):
+            #     for src_host in host.hosts:
+            #         color = "#%06x" % random.randint(0, 0xFFFFFF)
+            #         received = (src_host.bytes_sent / total_received) * 100
+            #         with tag('div', klass="bar", style="width:{}%; left:{}%; background-color:{}".format(received, left, color)):
+            #             text('')
+            #         left = left + received
             total_received = host.total_bytes_received
-            with tag('div', klass="bar-container"):
+            with tag('h2'):
+                text(host.ip)
+            with tag('table', border="0", cellpadding="0", cellspacing="0", klass="bar-chart"):
                 for src_host in host.hosts:
-                    color = "#%06x" % random.randint(0, 0xFFFFFF)
                     received = (src_host.bytes_sent / total_received) * 100
-                    with tag('div', klass="bar", style="width:{}%; left:{}%; background-color:{}".format(received, left, color)):
-                        text('')
-                    left = left + received
+                    with tag('tr'):
+                        with tag('td', valign="middle", align="left", klass="ip-address"):
+                            text(src_host.ip)
+                        with tag('td', valign="middle", align="left", klass="bar"):
+                            with tag('div', style="width:{}%".format(received)):
+                                text('{}%'.format(received))
+
+
+
         return indent(doc.getvalue())
 
     def find_host(self, ip):
@@ -159,7 +176,10 @@ class Analyzer(object):
         graph_html = self.generate_graph_html()
         with open('./report_template.html') as f:
             file_str = f.read()
+        extended_file_str = file_str.format(events_html=events_html, received_html=received_html, graph_html=graph_html)
         new_file_str = file_str.format(events_html=events_html, received_html=received_html, graph_html=graph_html)
+        with open('extended_report.html', 'w') as f:
+            f.write(new_file_str)
         with open('report.html', 'w') as f:
             f.write(new_file_str)
 
