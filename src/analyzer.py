@@ -101,7 +101,7 @@ class Analyzer(object):
                             text(src_host.ip)
                         with tag('td', valign="middle", align="left", klass="bar"):
                             with tag('div', style="width:{}%".format(received)):
-                                text('{}%'.format(received))
+                                text('{}%'.format(round(received, 3)))
 
 
 
@@ -176,10 +176,10 @@ class Analyzer(object):
         graph_html = self.generate_graph_html()
         with open('./report_template.html') as f:
             file_str = f.read()
-        extended_file_str = file_str.format(events_html=events_html, received_html=received_html, graph_html=graph_html)
         new_file_str = file_str.format(events_html='', received_html=received_html, graph_html=graph_html)
+        extended_file_str = file_str.format(events_html=events_html, received_html=received_html, graph_html=graph_html)
         with open('extended_report.html', 'w') as f:
-            f.write(new_file_str)
+            f.write(extended_file_str)
         with open('report.html', 'w') as f:
             f.write(new_file_str)
 
