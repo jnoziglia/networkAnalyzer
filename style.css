@@ -9,12 +9,12 @@ body{
     margin: 0 auto;
 }
 
-table {
+.events table {
 	background-color: black;
 	margin: 0 auto;
 }
 
-th, td {
+.events th, td {
 	text-align: center;
 	border: 1px solid black;
 	background-color: white;
@@ -29,13 +29,18 @@ th, td {
     position: relative;
 }
 
-.bar {
+.bar div {
 	height: 20px;
     background-color: steelblue;
 }
 
 .bar-chart {
 	margin: 10px 0
+}
+
+.bar-chart tr,
+.bar-chart td {
+	background-color: white;
 }
 
 .ip-address {
