@@ -28,35 +28,32 @@ hosts = []
 
 class Analyzer(object):
     # Method to generate size in readable unit
-    def sizeof_fmt(num, suffix='B'):
-        for unit in ['','Ki','Mi','Gi','Ti','Pi','Ei','Zi']:
+    def sizeof_fmt(self, num, suffix='B'):
+        for unit in ['', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei', 'Zi']:
             if abs(num) < 1024.0:
                 return "%3.1f%s%s" % (num, unit, suffix)
             num /= 1024.0
         return "%.1f%s%s" % (num, 'Yi', suffix)
 
     # Method to generate a list of all logged events, in HTML
-    def generate_events_html(self):
-        doc, tag, text = Doc().tagtext()
-        for event in events:
-            with tag('tr'):
-                with tag('td'):
-                    text(event.timestamp)
-                with tag('td'):
-                    text(event.dst)
-                with tag('td'):
-                    text(event.dst_port)
-                with tag('td'):
-                    text(event.src)
-                with tag('td'):
-                    text(event.src_port)
-                with tag('td'):
-                    text(event.t_protocol)
-                with tag('td'):
-                    text(event.length)
-                with tag('td'):
-                    text(event.id)
-        return indent(doc.getvalue())
+    def add_event_to_html(self, event, main_doc, main_tag, main_text):
+        with main_tag('tr'):
+            with main_tag('td'):
+                main_text(event.timestamp)
+            with main_tag('td'):
+                main_text(event.dst)
+            with main_tag('td'):
+                main_text(event.dst_port)
+            with main_tag('td'):
+                main_text(event.src)
+            with main_tag('td'):
+                main_text(event.src_port)
+            with main_tag('td'):
+                main_text(event.t_protocol)
+            with main_tag('td'):
+                main_text(event.length)
+            with main_tag('td'):
+                main_text(event.id)
 
     # Method to generate a list of bytes received by each host, in HTML
     def generate_received_html(self):
@@ -67,15 +64,15 @@ class Analyzer(object):
             with tag('h3'):
                 text(host.ip)
             with tag('p'):
-                text('Total Bytes Received: {}b'.format(host.total_bytes_received))
+                text('Total Bytes Received: {}'.format(self.sizeof_fmt(host.total_bytes_received)))
             for src_host in host.hosts:
                 with tag('h4'):
                     text('Bytes received from {}'.format(src_host.ip))
                 with tag('p'):
-                    text('Total: {}b'.format(src_host.bytes_sent))
+                    text('Total: {}'.format(self.sizeof_fmt(src_host.bytes_sent)))
                 for protocol in src_host.protocols:
                     with tag('p'):
-                        text('{}: {}b'.format(protocol.name, protocol.bytes_sent))
+                        text('{}: {}'.format(protocol.name, self.sizeof_fmt(protocol.bytes_sent)))
         return indent(doc.getvalue())
 
     # Method to generate
@@ -102,11 +99,13 @@ class Analyzer(object):
 
     def process_dump_file(self, p):
         add_event = 0
+        main_doc, main_tag, main_text = Doc().tagtext()
         for line in iter(p.stdout.readline, b''):
             m = reg_timestamp.match(line.decode())
             if m:
                 if add_event == 1:
                     events.append(event)
+                    self.add_event_to_html(event, main_doc, main_tag, main_text)
                 add_event = 1
                 event = Event(m.group('timestamp'), m.group('protocol'))
                 m = reg_ip_1.search(line.decode())
@@ -151,11 +150,11 @@ class Analyzer(object):
                 m = reg_port_error.search(line.decode())
                 if m:
                     add_event = 0
+        return indent(main_doc.getvalue())
 
     def main(self):
         p = sub.Popen(('sudo', 'tcpdump', 'ip', '-l', '-nnv', '-r', '../output'), stdout=sub.PIPE)
-        self.process_dump_file(p)
-        events_html = self.generate_events_html()
+        events_html = self.process_dump_file(p)
         received_html = self.generate_received_html()
         graph_html = self.generate_graph_html()
         with open('./report_template.html') as f:
