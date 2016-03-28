@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. ~/networkAnalyzer/config/ip_config.cfg
+. ../config/ip_config.cfg
 
 sftp ubuntu@"$ip_1":/home/ubuntu/networkAnalyzer/captures/"$ip_1"
 sftp ubuntu@"$ip_2":/home/ubuntu/networkAnalyzer/captures/"$ip_2"

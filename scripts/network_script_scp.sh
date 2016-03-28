@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. ~/networkAnalyzer/config/ip_config.cfg
+. ../config/ip_config.cfg
 
 while [ true ]
 do
