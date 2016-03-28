@@ -29,18 +29,24 @@ body{
     position: relative;
 }
 
-.bar div {
-	height: 20px;
-    background-color: steelblue;
-}
-
 .bar-chart {
-	margin: 10px 0
+	margin: 10px 0;
+	width: 100%;
 }
 
 .bar-chart tr,
 .bar-chart td {
 	background-color: white;
+}
+
+.bar {
+	width: 94%;
+}
+
+.bar div {
+	height: 20px;
+    background-color: steelblue;
+    padding-left: 5px;
 }
 
 .ip-address {
