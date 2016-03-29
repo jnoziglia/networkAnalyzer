@@ -83,6 +83,10 @@ class Analyzer(object):
                     for protocol in src_host.protocols:
                         with tag('p'):
                             text('{}: {}'.format(protocol.name, self.sizeof_fmt(protocol.bytes_sent)))
+                    with tag('p'):
+                        text('--------------')
+        with tag('div', style="clear:both"):
+            text('')
         return indent(doc.getvalue())
 
     # Method to generate bar chart in HTML
@@ -107,8 +111,7 @@ class Analyzer(object):
         return indent(doc.getvalue())
 
 
-    @staticmethod
-    def generate_packets_html():
+    def generate_packets_html(self):
         doc, tag, text = Doc().tagtext()
         with tag('h1'):
             text('Packets transferred from each host')
@@ -120,7 +123,7 @@ class Analyzer(object):
                 for src_host in host.hosts:
                     total_from_host = 0
                     with tag('h4'):
-                        text('Bytes received from {}'.format(src_host.ip))
+                        text('Packets received from {}'.format(src_host.ip))
                     for protocol in src_host.protocols:
                         with tag('h4'):
                             text('Protocol: {}'.format(protocol.name))
@@ -137,13 +140,18 @@ class Analyzer(object):
                         with tag('p'):
                             text('Packets: {}'.format(amount))
                         with tag('p'):
-                            text('Minimum size packet: {}'.format(min_size))
+                            text('Minimum size packet: {}'.format(self.sizeof_fmt(min_size)))
                         with tag('p'):
-                            text('Maximum size packet: {}'.format(max_size))
+                            text('Maximum size packet: {}'.format(self.sizeof_fmt(max_size)))
                     with tag('p'):
-                        text('Total from {}: {}'.format(src_host.ip, total_from_host))
+                        with tag('strong'):
+                            text('Total from {}: {} packets'.format(src_host.ip, total_from_host))
+                    with tag('p'):
+                        text('--------------')
                 with tag('p'):
                     text('Total Received: {}'.format(total_received))
+        with tag('div', style="clear:both"):
+            text('')
         return indent(doc.getvalue())
 
     # Returns host in hosts list, filtered by IP
