@@ -21,8 +21,6 @@ class Host:
             protocol.packets.append(packet)
             host.protocols.append(protocol)
             self.hosts.append(host)
-        host.bytes_sent += length
-        self.total_bytes_received += length
 
     def process_protocol(self, event, length):
         protocol_list = [x for x in self.protocols if x.name == event.t_protocol]
