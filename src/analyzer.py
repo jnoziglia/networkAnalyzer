@@ -146,7 +146,6 @@ class Analyzer(object):
                     text('Total Received: {}'.format(total_received))
         return indent(doc.getvalue())
 
-
     # Returns host in hosts list, filtered by IP
     @staticmethod
     def process_host(event, length):
