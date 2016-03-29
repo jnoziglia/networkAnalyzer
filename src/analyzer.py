@@ -111,7 +111,7 @@ class Analyzer(object):
         host_list = [x for x in hosts if x.ip == event.dst]
         if host_list:
             host = host_list[0]
-            host.process_host(event)
+            host.process_host(event, length)
         else:
             host = Host(event.dst)
             src_host = Host(event.src)
