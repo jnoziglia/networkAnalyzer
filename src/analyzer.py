@@ -70,18 +70,19 @@ class Analyzer(object):
         with tag('h1'):
             text('Amount of data transferred from each host')
         for host in hosts:
-            with tag('h2'):
-                text(host.ip)
-            with tag('p'):
-                text('Total Bytes Received: {}'.format(self.sizeof_fmt(host.total_bytes_received)))
-            for src_host in host.hosts:
-                with tag('h4'):
-                    text('Bytes received from {}'.format(src_host.ip))
+            with tag('div', klass="col-4"):
+                with tag('h2'):
+                    text(host.ip)
                 with tag('p'):
-                    text('Total: {}'.format(self.sizeof_fmt(src_host.bytes_sent)))
-                for protocol in src_host.protocols:
+                    text('Total Bytes Received: {}'.format(self.sizeof_fmt(host.total_bytes_received)))
+                for src_host in host.hosts:
+                    with tag('h4'):
+                        text('Bytes received from {}'.format(src_host.ip))
                     with tag('p'):
-                        text('{}: {}'.format(protocol.name, self.sizeof_fmt(protocol.bytes_sent)))
+                        text('Total: {}'.format(self.sizeof_fmt(src_host.bytes_sent)))
+                    for protocol in src_host.protocols:
+                        with tag('p'):
+                            text('{}: {}'.format(protocol.name, self.sizeof_fmt(protocol.bytes_sent)))
         return indent(doc.getvalue())
 
     # Method to generate bar chart in HTML
@@ -104,6 +105,47 @@ class Analyzer(object):
                             with tag('div', style="width:{}%".format(received)):
                                 text('{}%'.format(round(received, 3)))
         return indent(doc.getvalue())
+
+
+    @staticmethod
+    def generate_packets_html():
+        doc, tag, text = Doc().tagtext()
+        with tag('h1'):
+            text('Packets transferred from each host')
+        for host in hosts:
+            total_received = 0
+            with tag('div', klass="col-4"):
+                with tag('h2'):
+                    text(host.ip)
+                for src_host in host.hosts:
+                    total_from_host = 0
+                    with tag('h4'):
+                        text('Bytes received from {}'.format(src_host.ip))
+                    for protocol in src_host.protocols:
+                        with tag('h5'):
+                            text('Protocol: {}'.format(protocol.name))
+                        max_size = 0
+                        min_size = -1
+                        amount = len(protocol.packets)
+                        for packet in protocol.packets:
+                            if packet.size > max_size:
+                                max_size = packet.size
+                            if packet.size < min_size or min_size == -1:
+                                min_size = packet.size
+                            with tag('p'):
+                                text('Packets: {}'.format(amount))
+                            with tag('p'):
+                                text('Minimum size packet: {}'.format(min_size))
+                            with tag('p'):
+                                text('Maximum size packet: {}'.format(max_size))
+                        total_received += amount
+                        total_from_host += amount
+                    with tag('p'):
+                        text('Total from {}: {}'.format(src_host.ip, total_from_host))
+                with tag('p'):
+                    text('Total Received: {}'.format(total_received))
+        return indent(doc.getvalue())
+
 
     # Returns host in hosts list, filtered by IP
     @staticmethod
@@ -153,30 +195,6 @@ class Analyzer(object):
                     if m and m.group('length') != 0:
                         length = int(m.group('length'))
                         self.process_host(event, length)
-                        # if host:
-                        #     src_host = host.find_host(event.src)
-                        #     if src_host:
-                        #         protocol = src_host.find_protocol(event.t_protocol)
-                        #         if protocol:
-                        #             protocol.bytes_sent += length
-                        #             protocol.find_packet(event.src_port)
-                        #         else:
-                        #             protocol = Protocol(event.t_protocol)
-                        #             src_host.protocols.append(protocol)
-                        #     else:
-                        #         src_host = Host(event.src)
-                        #         protocol = Protocol(event.t_protocol)
-                        #         src_host.protocols.append(protocol)
-                        #         host.hosts.append(src_host)
-                        # else:
-                        #     host = Host(event.dst)
-                        #     src_host = Host(event.src)
-                        #     protocol = Protocol(event.t_protocol)
-                        #     src_host.protocols.append(protocol)
-                        #     host.hosts.append(src_host)
-                        #     hosts.append(host)
-                        # src_host.bytes_sent += length
-                        # host.total_bytes_received += length
                 m = reg_port_error.search(line.decode())
                 if m:
                     add_event = 0
@@ -188,10 +206,11 @@ class Analyzer(object):
         events_html = self.process_dump_file(p)
         received_html = self.generate_received_html()
         graph_html = self.generate_graph_html()
+        packets_html = self.generate_packets_html()
         with open('../reports/report_template.html') as f:
             file_str = f.read()
-        new_file_str = file_str.format(events_html='', received_html=received_html, graph_html=graph_html)
-        extended_file_str = file_str.format(events_html=events_html, received_html=received_html, graph_html=graph_html)
+        new_file_str = file_str.format(events_html='', received_html=received_html, graph_html=graph_html, packets_html=packets_html)
+        extended_file_str = file_str.format(events_html=events_html, received_html=received_html, graph_html=graph_html, packets_html=packets_html)
         with open('../reports/extended_report.html', 'w') as f:
             f.write(extended_file_str)
         with open('../reports/report.html', 'w') as f:
