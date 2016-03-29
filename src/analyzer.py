@@ -107,10 +107,11 @@ class Analyzer(object):
 
     # Returns host in hosts list, filtered by IP
     @staticmethod
-    def find_host(ip):
-        host_list = [x for x in hosts if x.ip == ip]
+    def process_host(event, length):
+        host_list = [x for x in hosts if x.ip == event.dst]
         if host_list:
-            return host_list[0]
+            host = host_list[0]
+            src_host = host.process_host(event)
         else:
             return None
 
@@ -142,30 +143,31 @@ class Analyzer(object):
                     m = reg_length.search(line.decode())
                     if m and m.group('length') != 0:
                         length = int(m.group('length'))
-                        host = self.find_host(event.dst)
-                        if host:
-                            src_host = host.find_host(event.src)
-                            if src_host:
-                                protocol = src_host.find_protocol(event.t_protocol)
-                                if protocol:
-                                    protocol.bytes_sent += length
-                                else:
-                                    protocol = Protocol(event.t_protocol, length)
-                                    src_host.protocols.append(protocol)
-                            else:
-                                src_host = Host(event.src)
-                                protocol = Protocol(event.t_protocol, length)
-                                src_host.protocols.append(protocol)
-                                host.hosts.append(src_host)
-                        else:
-                            host = Host(event.dst)
-                            src_host = Host(event.src)
-                            protocol = Protocol(event.t_protocol, length)
-                            src_host.protocols.append(protocol)
-                            host.hosts.append(src_host)
-                            hosts.append(host)
-                        src_host.bytes_sent += length
-                        host.total_bytes_received += length
+                        self.process_host(event, length)
+                        # if host:
+                        #     src_host = host.find_host(event.src)
+                        #     if src_host:
+                        #         protocol = src_host.find_protocol(event.t_protocol)
+                        #         if protocol:
+                        #             protocol.bytes_sent += length
+                        #             protocol.find_packet(event.src_port)
+                        #         else:
+                        #             protocol = Protocol(event.t_protocol)
+                        #             src_host.protocols.append(protocol)
+                        #     else:
+                        #         src_host = Host(event.src)
+                        #         protocol = Protocol(event.t_protocol)
+                        #         src_host.protocols.append(protocol)
+                        #         host.hosts.append(src_host)
+                        # else:
+                        #     host = Host(event.dst)
+                        #     src_host = Host(event.src)
+                        #     protocol = Protocol(event.t_protocol)
+                        #     src_host.protocols.append(protocol)
+                        #     host.hosts.append(src_host)
+                        #     hosts.append(host)
+                        # src_host.bytes_sent += length
+                        # host.total_bytes_received += length
                 m = reg_port_error.search(line.decode())
                 if m:
                     add_event = 0

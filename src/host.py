@@ -1,3 +1,5 @@
+from protocol import *
+
 class Host:
     def __init__(self, ip):
         self.ip = ip
@@ -7,16 +9,29 @@ class Host:
         self.protocols = []
         self.color = ''
 
-    def find_host(self, ip):
-        host_list = [x for x in self.hosts if x.ip == ip]
+    def process_host(self, event, length):
+        host_list = [x for x in self.hosts if x.ip == event.src]
         if host_list:
-            return host_list[0]
+            host = host_list[0]
+            host.process_protocol(event, length)
         else:
-            return None
+            host = Host(event.src)
+            protocol = Protocol(event.t_protocol)
+            packet = Packet(event.src_port, event.dst_port, length)
+            protocol.packets.append(packet)
+            host.protocols.append(protocol)
+            self.hosts.append(host)
+        host.bytes_sent += length
+        self.total_bytes_received += length
 
-    def find_protocol(self, name):
-        protocol_list = [x for x in self.protocols if x.name == name]
+    def process_protocol(self, event, length):
+        protocol_list = [x for x in self.protocols if x.name == event.t_protocol]
         if protocol_list:
-            return protocol_list[0]
+            protocol = protocol_list[0]
+            protocol.process_packet(event, length)
+            protocol.bytes_sent += length
         else:
-            return None
+            protocol = Protocol(event.t_protocol, length)
+            packet = Packet(event.src_port, event.dst_port, length)
+            protocol.packets.append(packet)
+            self.protocols.append(protocol)
