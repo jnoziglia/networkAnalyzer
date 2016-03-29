@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Collects dump files from terminals, merges them into a single file and creates a text file out of the merged file
+
 . ../config/ip_config.cfg
 
 sftp ubuntu@"$ip_1":/home/ubuntu/networkAnalyzer/captures/"$ip_1"

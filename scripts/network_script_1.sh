@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Sends an echo request (PING) to every terminal every 10 seconds.
+
 . ../config/ip_config.cfg
 
 while [ true ]

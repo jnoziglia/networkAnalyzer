@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Copies repeatedly one of the resource files to every terminal, with a delay between 1 and 5 seconds between each transfer to the same terminal. 
+# Uses rcp command to copy the file over the network.
+
 . ../config/ip_config.cfg
 
 while [ true ]

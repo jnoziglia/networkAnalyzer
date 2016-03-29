@@ -7,7 +7,6 @@ class Host:
         self.bytes_sent = 0
         self.hosts = []
         self.protocols = []
-        self.color = ''
 
     def process_host(self, event, length):
         host_list = [x for x in self.hosts if x.ip == event.src]

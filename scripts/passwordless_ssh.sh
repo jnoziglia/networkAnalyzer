@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Script to create public key and send it to the other hosts in order to
-# connect through SSH without authenticating
+# connect through SSH without authenticating.
 # Runs on terminals
 
 . ../config/ip_config.cfg
