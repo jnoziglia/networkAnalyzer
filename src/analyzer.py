@@ -122,7 +122,7 @@ class Analyzer(object):
                     with tag('h4'):
                         text('Bytes received from {}'.format(src_host.ip))
                     for protocol in src_host.protocols:
-                        with tag('h5'):
+                        with tag('h4'):
                             text('Protocol: {}'.format(protocol.name))
                         max_size = 0
                         min_size = -1
@@ -132,14 +132,14 @@ class Analyzer(object):
                                 max_size = packet.size
                             if packet.size < min_size or min_size == -1:
                                 min_size = packet.size
-                            with tag('p'):
-                                text('Packets: {}'.format(amount))
-                            with tag('p'):
-                                text('Minimum size packet: {}'.format(min_size))
-                            with tag('p'):
-                                text('Maximum size packet: {}'.format(max_size))
                         total_received += amount
                         total_from_host += amount
+                        with tag('p'):
+                            text('Packets: {}'.format(amount))
+                        with tag('p'):
+                            text('Minimum size packet: {}'.format(min_size))
+                        with tag('p'):
+                            text('Maximum size packet: {}'.format(max_size))
                     with tag('p'):
                         text('Total from {}: {}'.format(src_host.ip, total_from_host))
                 with tag('p'):
