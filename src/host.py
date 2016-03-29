@@ -16,7 +16,7 @@ class Host:
             host.process_protocol(event, length)
         else:
             host = Host(event.src)
-            protocol = Protocol(event.t_protocol)
+            protocol = Protocol(event.t_protocol, length)
             packet = Packet(event.src_port, event.dst_port, length)
             protocol.packets.append(packet)
             host.protocols.append(protocol)
