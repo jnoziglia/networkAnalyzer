@@ -110,7 +110,7 @@ class Analyzer(object):
                                 text('{}%'.format(round(received, 3)))
         return indent(doc.getvalue())
 
-
+    # Method to generate a list with number of packets received by each host, in HTML
     def generate_packets_html(self):
         doc, tag, text = Doc().tagtext()
         with tag('h1'):
@@ -155,6 +155,8 @@ class Analyzer(object):
         return indent(doc.getvalue())
 
     # Returns host in hosts list, filtered by IP
+    # If host exists delegates the processing of the rest of the information to Host class
+    # If host doesn´t exist, creates it and appends it
     @staticmethod
     def process_host(event, length):
         host_list = [x for x in hosts if x.ip == event.dst]
@@ -179,8 +181,10 @@ class Analyzer(object):
         add_event = 0
         main_doc, main_tag, main_text = Doc().tagtext()
         for line in iter(p.stdout.readline, b''):
+            # Compares first with timestamp regex. Timestamp regex indicates a new packet
             m = reg_timestamp.match(line.decode())
             if m:
+                # add_event indicates if there is a processed event already
                 if add_event == 1:
                     events.append(event)
                     self.add_event_to_html(event, main_doc, main_tag, main_text)
@@ -199,9 +203,11 @@ class Analyzer(object):
                     event.dst = m.group('dst')
                     event.dst_port = m.group('dst_port')
                     m = reg_length.search(line.decode())
+                    # If TCP data is not 0, the packet gets further processing
                     if m and m.group('length') != 0:
                         length = int(m.group('length'))
                         self.process_host(event, length)
+                # If there is a port unreachable error, event gets discarded
                 m = reg_port_error.search(line.decode())
                 if m:
                     add_event = 0
@@ -209,13 +215,17 @@ class Analyzer(object):
 
     # Main function, executed when ran from terminal
     def main(self, dump_file):
+        # Opens dump file
         p = sub.Popen(('sudo', 'tcpdump', 'ip', '-l', '-nnv', '-r', dump_file), stdout=sub.PIPE)
+        # Generates HTML strings
         events_html = self.process_dump_file(p)
         received_html = self.generate_received_html()
         graph_html = self.generate_graph_html()
         packets_html = self.generate_packets_html()
+        # Reads template
         with open('../reports/report_template.html') as f:
             file_str = f.read()
+        # Generates reports
         new_file_str = file_str.format(events_html='', received_html=received_html, graph_html=graph_html, packets_html=packets_html)
         extended_file_str = file_str.format(events_html=events_html, received_html=received_html, graph_html=graph_html, packets_html=packets_html)
         with open('../reports/extended_report.html', 'w') as f:
