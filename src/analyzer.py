@@ -115,7 +115,7 @@ class Analyzer(object):
         else:
             host = Host(event.dst)
             src_host = Host(event.src)
-            protocol = Protocol(event.t_protocol)
+            protocol = Protocol(event.t_protocol, length)
             packet = Packet(event.src_port, event.dst_port, length)
             protocol.packets.append(packet)
             src_host.protocols.append(protocol)
